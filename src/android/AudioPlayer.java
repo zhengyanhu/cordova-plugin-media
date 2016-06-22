@@ -26,6 +26,7 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
+import android.os.Build;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,6 +92,8 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
     private MediaPlayer player = null;      // Audio player object
     private boolean prepareOnly = true;     // playback after file prepare flag
     private int seekOnPrepared = 0;     // seek to this location once media is prepared
+
+    private int numberOfLoops = 1;
 
     /**
      * Constructor.
@@ -294,7 +297,12 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      *
      * @param file              The name of the audio file.
      */
-    public void startPlaying(String file) {
+    public void startPlaying(String file, int numberOfLoops) {
+        this.numberOfLoops = numberOfLoops; // TODO: is it the right place for that?
+        if (Build.VERSION.SDK_INT < 16) {
+            Log.w(LOG_TAG, "gapless audio loop is not supported by SDK" + Build.VERSION.SDK_INT);
+            // TODO: will have to simulate the "nextPlayer" (just prepare and start after onComplete)
+        }
         if (this.readyPlayer(file) && this.player != null) {
             this.player.start();
             this.setState(STATE.MEDIA_RUNNING);
@@ -302,6 +310,10 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
         } else {
             this.prepareOnly = false;
         }
+    }
+
+    public void startPlaying(String file) {
+        this.startPlaying(file, this.numberOfLoops);
     }
 
     /**

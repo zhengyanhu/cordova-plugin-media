@@ -127,6 +127,14 @@ public class AudioHandler extends CordovaPlugin {
             this.resumeRecordingAudio(args.getString(0));
         }
         else if (action.equals("startPlayingAudio")) {
+            int numberOfLoops = 1;
+            if (args.length() > 2) {
+                JSONObject options = args.getJSONObject(2);
+                if (options.has("numberOfLoops")) {
+                    numberOfLoops = options.getInt("numberOfLoops");
+                }
+            }
+
             String target = args.getString(1);
             String fileUriStr;
             try {
@@ -135,7 +143,7 @@ public class AudioHandler extends CordovaPlugin {
             } catch (IllegalArgumentException e) {
                 fileUriStr = target;
             }
-            this.startPlayingAudio(args.getString(0), FileHelper.stripFileProtocol(fileUriStr));
+            this.startPlayingAudio(args.getString(0), FileHelper.stripFileProtocol(fileUriStr), numberOfLoops);
         }
         else if (action.equals("seekToAudio")) {
             this.seekToAudio(args.getString(0), args.getInt(1));
@@ -315,9 +323,9 @@ public class AudioHandler extends CordovaPlugin {
      * @param id				The id of the audio player
      * @param file				The name of the audio file.
      */
-    public void startPlayingAudio(String id, String file) {
+    public void startPlayingAudio(String id, String file, int numberOfLoops) {
         AudioPlayer audio = getOrCreatePlayer(id, file);
-        audio.startPlaying(file);
+        audio.startPlaying(file, numberOfLoops);
         getAudioFocus();
     }
 
