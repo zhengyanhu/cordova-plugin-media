@@ -93,6 +93,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
     private boolean prepareOnly = true;     // playback after file prepare flag
     private int seekOnPrepared = 0;     // seek to this location once media is prepared
 
+    private MediaPlayer nextPlayer = null;
     private int numberOfLoops = 1;
 
     /**
@@ -534,6 +535,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      */
     public void setVolume(float volume) {
         this.player.setVolume(volume, volume);
+        this.nextPlayer.setVolume(volume, volume);
     }
 
     /**
@@ -566,6 +568,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
                 case MEDIA_NONE:
                     if (this.player == null) {
                         this.player = new MediaPlayer();
+                        this.nextPlayer = new MediaPlayer();
                     }
                     try {
                         this.loadAudioFile(file);
@@ -651,14 +654,28 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
                     FileInputStream fileInputStream = new FileInputStream(file);
                     this.player.setDataSource(fileInputStream.getFD());
                     fileInputStream.close();
+
+                    fileInputStream = new FileInputStream(file);
+                    this.nextPlayer.setDataSource(fileInputStream.getFD());
+                    fileInputStream.close();
                 }
                 else {
                     this.player.setDataSource(Environment.getExternalStorageDirectory().getPath() + "/" + file);
                 }
             }
+
+
             this.setState(STATE.MEDIA_STARTING);
             this.player.setOnPreparedListener(this);
             this.player.prepare();
+
+            if (Build.VERSION.SDK_INT >= 16) {
+                this.nextPlayer.prepare();
+                this.player.setNextMediaPlayer(this.nextPlayer);
+            }
+
+
+
 
             // Get duration
             this.duration = getDurationInSeconds();
