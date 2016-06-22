@@ -154,11 +154,11 @@ public class AudioHandler extends CordovaPlugin {
         else if (action.equals("stopPlayingAudio")) {
             this.stopPlayingAudio(args.getString(0));
         } else if (action.equals("setVolume")) {
-           try {
-               this.setVolume(args.getString(0), Float.parseFloat(args.getString(1)));
-           } catch (NumberFormatException nfe) {
-               //no-op
-           }
+            try {
+                this.setVolume(args.getString(0), Float.parseFloat(args.getString(1)));
+            } catch (NumberFormatException nfe) {
+                //no-op
+            }
         } else if (action.equals("getCurrentPositionAudio")) {
             float f = this.getCurrentPositionAudio(args.getString(0));
             callbackContext.sendPluginResult(new PluginResult(status, f));
@@ -426,8 +426,8 @@ public class AudioHandler extends CordovaPlugin {
      * Get the the audio focus
      */
     private OnAudioFocusChangeListener focusChangeListener = new OnAudioFocusChangeListener() {
-            public void onAudioFocusChange(int focusChange) {
-                switch (focusChange) {
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
                 case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) :
                 case (AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) :
                 case (AudioManager.AUDIOFOCUS_LOSS) :
@@ -438,15 +438,15 @@ public class AudioHandler extends CordovaPlugin {
                     break;
                 default:
                     break;
-                }
             }
-        };
+        }
+    };
 
     public void getAudioFocus() {
         AudioManager am = (AudioManager) this.cordova.getActivity().getSystemService(Context.AUDIO_SERVICE);
         int result = am.requestAudioFocus(focusChangeListener,
-                                          AudioManager.STREAM_MUSIC,
-                                          AudioManager.AUDIOFOCUS_GAIN);
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
 
         if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             System.out.println("AudioHandler.getAudioFocus() Error: Got " + result + " instead of " + AudioManager.AUDIOFOCUS_REQUEST_GRANTED);
